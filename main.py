@@ -1,17 +1,10 @@
+import schedule
+import time
 import requests
 from xml.etree import ElementTree
-import os
 import datetime
 
 # Todo Дописать кастомные праздники день программиста/бухгалтера/системного администратора/ молочной промышленности
-# Todo выполнение кода в отведённое для этого время
-
-proxy = 'http://040938:0508Asdf5466@192.168.168.40:3128'
-os.environ['http_proxy'] = proxy
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
-
 
 # если сегодня праздник и вчера не было праздника, говорим что сегодня праздник, вызовем в 9.00
 def verify_holiday():
@@ -51,7 +44,6 @@ def check_holiday(date: datetime.datetime, calendar) -> str:
 # true если выходной или суббота/воскресенье
 def check_day_off(date: datetime.datetime, calendar) -> bool:
     str_day = date.strftime('%m.%d')
-    print(str_day)
     for days in calendar.iter('days'):
         for day in days:
             if day.attrib.get('d') == str_day:
@@ -61,7 +53,24 @@ def check_day_off(date: datetime.datetime, calendar) -> bool:
     return False
 
 
-if __name__ == '__main__':
-    print(verify_dayoff())
+def say_at_morning():
     print(verify_holiday())
+
+
+def say_at_end_of_the_day():
+    print(verify_dayoff())
+
+
+schedule.every().day.at("09:00").do(say_at_morning)
+schedule.every().day.at("16:55").do(say_at_end_of_the_day)
+
+
+def schedule_loop():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+schedule_loop()
+
 
